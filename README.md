@@ -10,4 +10,18 @@ If you use NPM, `npm install d3-peaks`. Otherwise, download the [latest release]
 
 ## API Reference
 
-<a href="#peaks" name="peaks">#</a> <b>peaks</b>()
+Example use:
+```js
+var r = d3.ricker()
+  .std(2);
+  
+console.log(r(0), r(1), r(2));
+```
+
+<a href="#ricker" name="ricker">#</a> <b>d3.ricker</b>()
+
+Returns a function to compute the ricker wavelet with default standard deviation 1.0.
+
+<a href="#ricker-std" name="ricker-std">#</a> <b>std</b>(<i>value</i>)
+
+The "width" or standard deviation of the wavelet.
