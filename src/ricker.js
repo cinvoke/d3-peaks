@@ -19,7 +19,5 @@ export default function() {
     return arguments.length ? (σ = _, ricker) : σ;
   }
   
-  return function() {
-    return ricker;
-  };
+  return ricker;
 };
