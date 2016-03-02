@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Convolution</title>
+<style>
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="d3-peaks.js" charset="utf-8"></script>
+<script>
+  
+  var data = [5,10,7,6,15,11,12,16,15,13,10,20];
+  var convolve = d3_peaks.convolve()
+    .reach(5);
+    
+  var convolution = convolve(data);
+  console.log(convolution);
+</script>
+</body>

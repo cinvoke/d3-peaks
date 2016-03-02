@@ -19,7 +19,7 @@
   },
   "scripts": {
     "pretest": "mkdir -p build && node -e 'process.stdout.write(\"var version = \\\"\" + require(\"./package.json\").version + \"\\\"; export * from \\\"../index\\\"; export {version};\");' > build/bundle.js && rollup -f umd -n d3_peaks -o build/d3-peaks.js -- build/bundle.js",
-    "prepublish": "uglifyjs build/d3-peaks.js -c -m -o build/d3-peaks.min.js && rm -f build/d3-peaks.zip && zip -j build/d3-peaks.zip -- LICENSE README.md build/d3-peaks.js build/d3-peaks.min.js"
+    "prepublish": "npm run pretest & uglifyjs build/d3-peaks.js -c -m -o build/d3-peaks.min.js && rm -f build/d3-peaks.zip && zip -j build/d3-peaks.zip -- LICENSE README.md build/d3-peaks.js build/d3-peaks.min.js"
   },
   "devDependencies": {
     "faucet": "0.0",
