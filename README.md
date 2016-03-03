@@ -22,7 +22,7 @@ If specified, changes the number of points to sample from the smoother. For exam
 
 <a href="#convolve-kernel" name="convolve-kernel">#</a> d3_peaks.<b>kernel</b>(<i>kernel</i>)
 
-If specified, changes the kernel function or \"smoother\". Otherwise, returns the current kernel.
+If specified, changes the kernel function or "smoother". Otherwise, returns the current kernel.
 
 ```
 var convolve = d3_peaks.convolve()
@@ -38,7 +38,7 @@ If specified , it returns φ(<i>x</i>). Otherwise, returns a function to compute
 
 <a href="#ricker-std" name="ricker-std">#</a> <b>std</b>(<i>value</i>)
 
-If specified, it sets the standard deviation of the curve to <i>value</i>. Otherwise, returns the \"width\" or standard deviation of the wavelet.
+If specified, it sets the standard deviation of the curve to <i>value</i>. Otherwise, returns the "width" or standard deviation of the wavelet.
 
 ```js
 var y = d3_peaks.ricker()
