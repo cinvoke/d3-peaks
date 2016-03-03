@@ -36,7 +36,7 @@ var signal = convolve([1,2,3,2.5,0,1,4,5,3,-1,-2]);
 
 If specified , it returns φ(<i>x</i>). Otherwise, returns a function to compute the ricker wavelet with default standard deviation 1.0.
 
-<a href="#ricker-std" name="ricker-std">#</a> <b>std</b>(<i>value</i>)
+<a href="#ricker-std" name="ricker-std">#</a> d3_peaks.<b>std</b>(<i>value</i>)
 
 If specified, it sets the standard deviation of the curve to <i>value</i>. Otherwise, returns the "width" or standard deviation of the wavelet.
 
