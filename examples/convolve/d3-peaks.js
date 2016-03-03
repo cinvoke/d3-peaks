@@ -29,11 +29,7 @@
   };
 
   function convolve() {
-    var KERNELS = {
-      "ricker": ricker()
-    };
-    
-    var kernel = KERNELS.ricker;
+    var kernel = ricker();
     var reach = kernel.std * 5; 
     
     /**
@@ -43,17 +39,16 @@
      * h: smoother
      */
     var convolve = function(signal) {
-      var deltas = range(reach),
-          size = signal.length,
+      var size = signal.length,
           n = -1,
           convolution = new Array(size);
           
       while (++n < size) {
         var y = 0;
-        deltas.forEach(function(δ) {
+        
+        var box = boundingBox(n, reach, 0, size - 1);
+        box.forEach(function(δ) {
           var k = n + δ;
-          if (k < 0 || k >= size) return;
-          
           y += signal[k] * kernel(δ);
         });
         convolution[n] = y;
@@ -63,7 +58,7 @@
     };
     
     convolve.kernel = function(_) {
-      return arguments.length ? (kernel = KERNELS[_], convolve) : kernel;
+      return arguments.length ? (kernel = _, convolve) : kernel;
     }
     
     /**
@@ -82,6 +77,16 @@
         range[i] = (-reach) + i;
       }
       return range;
+    }
+    
+    function boundingBox(n, reach, lo, hi) {
+      for (var i = 1; i <= reach; i++) {
+        var left  = n - i,
+            right = n + i;
+        if (left >= lo && right <= hi) continue;
+        return range(i - 1);
+      }
+      return range(reach);
     }
     
     return convolve;

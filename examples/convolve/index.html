@@ -23,9 +23,12 @@
       height = 470,
       margin = {top: 10, left: 30, bottom: 10, right: 10};
   
-  var data = [5,10,7,6,15,11,12,16,15,13,10,20];
+  var data = [0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0];
+  var ricker = d3_peaks.ricker()
+    .std(1.5);
   var convolve = d3_peaks.convolve()
-    .reach(5);
+    .reach(5)
+    .kernel(ricker);
   var convolution = convolve(data);
   
   var svg = d3.select("body").append("svg")
@@ -40,18 +43,20 @@
     .range([0, width])
     
   var y = d3.scale.linear()
-    .domain([-10,30])
+    .domain([-1,1])
     .range([height, 0]);
     
   var line = d3.svg.line()
     .x(function(d, i) { return x(i); })
     .y(function(d) { return y(d); });
   
-  g.append("g")
+  var original = g.append("g")
     .datum(data)
-    .append("g").append("path")
-      .attr("d", line)
-      .attr("class", "raw");
+    .append("g")
+    
+  original.append("path")
+    .attr("d", line)
+    .attr("class", "raw");
       
   g.append("g")
     .datum(convolution)
