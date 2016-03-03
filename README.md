@@ -16,11 +16,11 @@ If you use NPM, `npm install d3-peaks`. Otherwise, download the [latest release]
 
 If specified, convolve the <i>signal</i> array with the smoother. Otherwise, returns a function to convolve a signal with the smoother.
 
-<a href="#convolve-reach" name="convolve-reach">#</a> d3_peaks.<b>reach</b>(<i>r</i>)
+<a href="#convolve-reach" name="convolve-reach">#</a> <b>reach</b>(<i>r</i>)
 
 If specified, changes the number of points to sample from the smoother. For example, <i>r</i> = 2 means we sample x-coordinates [-2, -1, 0, 1, 2] from the smoother. Otherwise, returns the current value of reach.
 
-<a href="#convolve-kernel" name="convolve-kernel">#</a> d3_peaks.<b>kernel</b>(<i>kernel</i>)
+<a href="#convolve-kernel" name="convolve-kernel">#</a> <b>kernel</b>(<i>kernel</i>)
 
 If specified, changes the kernel function or "smoother". Otherwise, returns the current kernel.
 
@@ -36,7 +36,7 @@ var signal = convolve([1,2,3,2.5,0,1,4,5,3,-1,-2]);
 
 If specified , it returns φ(<i>x</i>). Otherwise, returns a function to compute the ricker wavelet with default standard deviation 1.0.
 
-<a href="#ricker-std" name="ricker-std">#</a> d3_peaks.<b>std</b>(<i>value</i>)
+<a href="#ricker-std" name="ricker-std">#</a> <b>std</b>(<i>value</i>)
 
 If specified, it sets the standard deviation of the curve to <i>value</i>. Otherwise, returns the "width" or standard deviation of the wavelet.
 
