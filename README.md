@@ -24,7 +24,7 @@ If specified, changes the number of points to sample from the smoother. For exam
 
 If specified, changes the kernel function or "smoother". Otherwise, returns the current kernel.
 
-```
+```js
 var convolve = d3_peaks.convolve()
                         .reach(3);
 var signal = convolve([1,2,3,2.5,0,1,4,5,3,-1,-2]);
