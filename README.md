@@ -5,6 +5,7 @@ Find peaks in an array based on "Improved peak detection" \[1\]
 \[1\] Du, Pan, Warren A. Kibbe, and Simon M. Lin. "Improved peak detection in mass spectrum by incorporating continuous wavelet transform-based pattern matching." Bioinformatics 22.17 (2006): 2059-2065.
 
 For examples, please see:
+*  [Convolution](http://bl.ocks.org/efekarakus/9e5d933195dee8b4a882)
 *  [Ricker Wavelet](http://bl.ocks.org/efekarakus/3c30061ef9e56c2328c6)
 
 ## Installing
