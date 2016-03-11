@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Find Peaks</title>
+<body>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="d3-peaks.js" charset="utf-8"></script>
+<script>
+  var width = 800,
+      height = 470,
+      margin = {top: 10, left: 30, bottom: 20, right: 10};
+  
+  var signal = [0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0];
+  var ricker = d3_peaks.ricker;
+  var findPeaks = d3_peaks.findPeaks()
+    .kernel(ricker)
+    .widths([1,2]);
+    
+  var peaks = findPeaks(signal);
+</script>
+</body>
