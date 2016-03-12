@@ -19,5 +19,12 @@ export default function() {
     return arguments.length ? (σ = _, ricker) : σ;
   }
   
+  /**
+   * Range of points to sample from the wavelet. [-reach, reach]
+   */
+  ricker.reach = function() {
+    return 5 * σ;
+  }
+  
   return ricker;
 };

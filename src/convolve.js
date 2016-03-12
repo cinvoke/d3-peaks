@@ -2,7 +2,6 @@ import ricker from "./ricker";
 
 export default function() {
   var kernel = ricker();
-  var reach = kernel.std * 5; 
   
   /**
    * y[n] = Sum_k{x[k] * h[n-k]}
@@ -18,7 +17,7 @@ export default function() {
     while (++n < size) {
       var y = 0;
       
-      var box = boundingBox(n, reach, 0, size - 1);
+      var box = boundingBox(n, kernel.reach(), 0, size - 1);
       box.forEach(function(δ) {
         var k = n + δ;
         y += signal[k] * kernel(δ);
@@ -31,13 +30,6 @@ export default function() {
   
   convolve.kernel = function(_) {
     return arguments.length ? (kernel = _, convolve) : kernel;
-  }
-  
-  /**
-   * Mid-range of the kernel we want to sample from.
-   */
-  convolve.reach = function(_) {
-    return arguments.length ? (reach = _, convolve) : reach;
   }
   
   function range(reach) {
