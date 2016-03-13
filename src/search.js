@@ -64,3 +64,11 @@ export function nearestNeighbor(line, maximas, window) {
   }
   return null;
 }
+
+export function percentile(arr, perc) {
+  var length = arr.length;
+  var index = Math.min(length - 1, Math.ceil(perc * length));
+  
+  arr.sort(function(a, b) { return a - b; });
+  return arr[index];
+}

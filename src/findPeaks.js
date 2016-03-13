@@ -2,13 +2,13 @@ import ricker from "./ricker";
 import convolve from "./convolve";
 import Point from "./Point";
 import RidgeLine from "./RidgeLine";
-import {maximas, nearestNeighbor} from "./search";
+import {maximas, nearestNeighbor, percentile} from "./search";
 
 export default function() {
   var kernel = ricker,
-      gap = 1,
-      lineLength = 2,
-      snr = 1.0,
+      gapThreshold = 1,
+      minLineLength = 2,
+      minSNR = 1.0,
       widths = [1];
   
   var findPeaks = function(signal) {
@@ -18,6 +18,9 @@ export default function() {
     
     var ridgeLines = initializeRidgeLines(M, n);
     ridgeLines = connectRidgeLines(M, n, ridgeLines);
+    ridgeLines = filterRidgeLines(M, ridgeLines);
+    
+    return peaks(ridgeLines);
   };
   
   /**
@@ -31,33 +34,31 @@ export default function() {
    * Expected widths of the peaks.
    */
   findPeaks.widths = function(_) {
-    return arguments.length ? (_.sort(), widths = _, findPeaks) : widths;
+    _.sort(function(a, b) { return a - b; });
+    return arguments.length ? (widths = _, findPeaks) : widths;
   }
   
   /**
    * Number of gaps that we allow in the ridge lines.
    */
-  findPeaks.gap = function(_) {
-    return arguments.length ? (gap = _, findPeaks) : gap;
+  findPeaks.gapThreshold = function(_) {
+    return arguments.length ? (gapThreshold = _, findPeaks) : gapThreshold;
   }
   
   /**
-   * Minimum ridge line length to consider.
+   * Minimum ridge line length.
    */
-  findPeaks.lineLength = function(_) {
-    return arguments.length ? (lineLength = _, findPeaks) : lineLength;
+  findPeaks.minLineLength = function(_) {
+    return arguments.length ? (minLineLength = _, findPeaks) : minLineLength;
   }
   
   /**
    * Minimum signal to noise ratio for the peaks.
    */
-  findPeaks.snr = function(_) {
-    return arguments.length ? (snr = _, findPeaks) : snr;
+  findPeaks.minSNR = function(_) {
+    return arguments.length ? (minSNR = _, findPeaks) : minSNR;
   }
   
-  /**
-   * @return The convolution matrix.
-   */
   var CWT = function(signal) {
     var M = new Array(widths.length);
     widths.forEach(function(width, i) {
@@ -70,6 +71,29 @@ export default function() {
       M[i] = convolution;
     });
     return M;
+  }
+  
+  var SNR = function(line, M) {
+    var points = line.points;
+    var x = -1,
+        scale = 0;
+    // Signal strength is the maximum CWT coefficient.
+    var signal = Number.NEGATIVE_INFINITY;
+    points.forEach(function(point) {
+      if (point.y > signal) {
+        signal = point.y;
+        x = point.x;
+        scale = point.scale;
+      }
+    });
+    
+    width = widths[scale];
+    var lowerBound = Math.max(0, x - width);
+    var upperBound = Math.min(M[0].length, x + width);
+    var noise = percentile(M[0].slice(lowerBound, upperBound), 0.95);
+    
+    if (noise === 0) return 0;
+    return signal/noise;
   }
   
   var initializeRidgeLines = function(M, n) {
@@ -101,7 +125,7 @@ export default function() {
       
       // Remove lines that has exceeded the gap threshold
       ridgeLines = ridgeLines.filter(function(line) {
-        return !line.isDisconnected(gap);
+        return !line.isDisconnected(gapThreshold);
       });
       
       // Add all the unitialized ridge lines
@@ -115,6 +139,27 @@ export default function() {
       });
     }
     return ridgeLines;
+  }
+  
+  var filterRidgeLines = function(M, ridgeLines) {
+    ridgeLines = ridgeLines.filter(function(line) {
+      var snr = SNR(line, M);
+      return (snr >= minSNR) && (line.length() >= minLineLength);
+    });
+    return ridgeLines
+  }
+  
+  /**
+   * Pick the median for every ridge line.
+   */
+  var peaks = function(ridgeLines) {
+    var peaks = ridgeLines.map(function(line) {
+      var points = line.points;
+      points = points.map(function(point) { return point.x });
+      points.sort(function(a, b) { return a - b });
+      return points[Math.floor(points.length / 2)];
+    });
+    return peaks;
   }
   
   return findPeaks;

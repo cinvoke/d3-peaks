@@ -13,8 +13,14 @@
   var ricker = d3_peaks.ricker;
   var findPeaks = d3_peaks.findPeaks()
     .kernel(ricker)
+    .gapThreshold(1)
+    .minLineLength(1)
+    .minSNR(1.0)
     .widths([1,4]);
     
   var peaks = findPeaks(signal);
+  peaks.forEach(function(x) {
+    console.log(x, signal[x]);
+  })
 </script>
 </body>
