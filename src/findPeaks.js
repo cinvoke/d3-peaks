@@ -13,11 +13,9 @@ export default function() {
   
   var findPeaks = function(signal) {
     var M = CWT(signal);
-    var n = widths.length,
-        m = signal.length;
     
-    var ridgeLines = initializeRidgeLines(M, n);
-    ridgeLines = connectRidgeLines(M, n, ridgeLines);
+    var ridgeLines = initializeRidgeLines(M);
+    ridgeLines = connectRidgeLines(M, ridgeLines);
     ridgeLines = filterRidgeLines(M, ridgeLines);
     
     return peaks(ridgeLines);
@@ -96,7 +94,8 @@ export default function() {
     return signal/noise;
   }
   
-  var initializeRidgeLines = function(M, n) {
+  var initializeRidgeLines = function(M) {
+    var n = widths.length;
     var locals = maximas(M[n - 1], widths[n - 1]);
     var ridgeLines = [];
     locals.forEach(function(d) {
@@ -108,7 +107,8 @@ export default function() {
     return ridgeLines;
   }
   
-  var connectRidgeLines = function(M, n, ridgeLines) {
+  var connectRidgeLines = function(M, ridgeLines) {
+    var n = widths.length;
     for (var row = n - 2; row >= 0; row--) {
       var locals = maximas(M[row], widths[row]);
       var addedLocals = [];
