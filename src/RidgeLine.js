@@ -37,7 +37,7 @@ RidgeLine.prototype.length = function() {
  * @return {boolean} True if the gap in the line is above a threshold. False otherwise.
  */
 RidgeLine.prototype.isDisconnected = function (threshold) {
-  return this.gap >= threshold;
+  return this.gap > threshold;
 }
 
 export default RidgeLine;
