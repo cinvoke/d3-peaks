@@ -7,7 +7,7 @@ import {maximas, nearestNeighbor, percentile} from "./search";
 export default function() {
   var kernel = ricker,
       gapThreshold = 1,
-      minLineLength = 2,
+      minLineLength = 1,
       minSNR = 1.0,
       widths = [1];
   
@@ -85,7 +85,7 @@ export default function() {
       }
     });
     
-    width = widths[scale];
+    var width = widths[scale];
     var lowerBound = Math.max(0, x - width);
     var upperBound = Math.min(M[0].length, x + width);
     var noise = percentile(M[0].slice(lowerBound, upperBound), 0.95);
