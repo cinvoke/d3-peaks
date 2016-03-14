@@ -136,7 +136,7 @@
    * @return {boolean} True if the gap in the line is above a threshold. False otherwise.
    */
   RidgeLine.prototype.isDisconnected = function (threshold) {
-    return this.gap >= threshold;
+    return this.gap > threshold;
   }
 
   /**
@@ -217,7 +217,7 @@
   function findPeaks() {
     var kernel = ricker,
         gapThreshold = 1,
-        minLineLength = 2,
+        minLineLength = 1,
         minSNR = 1.0,
         widths = [1];
     
@@ -295,7 +295,7 @@
         }
       });
       
-      width = widths[scale];
+      var width = widths[scale];
       var lowerBound = Math.max(0, x - width);
       var upperBound = Math.min(M[0].length, x + width);
       var noise = percentile(M[0].slice(lowerBound, upperBound), 0.95);

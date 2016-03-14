@@ -1,26 +1,73 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Find Peaks</title>
+<style>
+  path {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+  }
+  
+  circle {
+    fill: black;
+  }
+  
+  circle.peak {
+    fill: crimson;
+  }
+</style>
 <body>
 <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="d3-peaks.js" charset="utf-8"></script>
 <script>
-  var width = 800,
-      height = 470,
+  var width = 920,
+      height = 474,
       margin = {top: 10, left: 30, bottom: 20, right: 10};
   
-  var signal = [0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0];
   var ricker = d3_peaks.ricker;
   var findPeaks = d3_peaks.findPeaks()
     .kernel(ricker)
     .gapThreshold(1)
     .minLineLength(1)
-    .minSNR(1.0)
-    .widths([1,4]);
+    .minSNR(1)
+    .widths([2]);
+  
+  d3.json("signal.json", function(error, json) {
+    if (error) console.warn(error);
     
-  var peaks = findPeaks(signal);
-  peaks.forEach(function(x) {
-    console.log(x, signal[x]);
+    var signal = json.signal;
+    var peaks = findPeaks(signal);
+    
+    var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+    var g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      
+    var x = d3.scale.linear()
+      .domain ([0, signal.length])
+      .range([20, width]);
+      
+    var y = d3.scale.linear()
+      .domain([0, d3.max(signal)])
+      .range([height, 0]);
+      
+    var line = d3.svg.line()
+      .x(function(d, i) { return x(i); })
+      .y(function(d) { return y(d); })
+      
+    g.append("g")
+      .datum(signal)
+      .append("path")
+      .attr("d", line);
+      
+    g.selectAll(".peak")
+      .data(peaks)
+      .enter().append("circle")
+        .attr("cx", function(i) { return x(i); })
+        .attr("cy", function(i) { return y(signal[i]); })
+        .attr("r", 4)
+        .attr("class", "peak");
   })
 </script>
 </body>
