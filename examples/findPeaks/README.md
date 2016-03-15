@@ -1,4 +1,3 @@
-# Find Peaks
 
 This example illustrates how to use the findPeaks API.
 You can download the library from [https://github.com/efekarakus/d3-peaks](https://github.com/efekarakus/d3-peaks).
