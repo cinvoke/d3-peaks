@@ -77,7 +77,7 @@ export default function() {
     var locals = maximas(M[n - 1], widths[n - 1]);
     var ridgeLines = [];
     locals.forEach(function(d) {
-      var point = new Point(d.x, d.y, n - 1);
+      var point = new Point(d.x, d.y, widths[n - 1]);
       var line = new RidgeLine();
       line.add(point);
       ridgeLines.push(line);
@@ -94,7 +94,7 @@ export default function() {
       // Find nearest neighbor at next scale and add to the line
       ridgeLines.forEach(function(line, i) {
         var x = nearestNeighbor(line, locals, widths[row]);
-        line.add(x === null ? null : new Point(x, M[row][x], row));
+        line.add(x === null ? null : new Point(x, M[row][x], widths[row]));
         
         if (x !== null) {
           addedLocals.push(x);
@@ -110,7 +110,7 @@ export default function() {
       locals.forEach(function(d) {
         if (addedLocals.indexOf(d.x) !== -1) return;
         
-        var point = new Point(d.x, d.y, row);
+        var point = new Point(d.x, d.y, widths[row]);
         var ridgeLine = new RidgeLine();
         ridgeLine.add(point);
         ridgeLines.push(ridgeLine);
@@ -121,7 +121,7 @@ export default function() {
   
   var filterRidgeLines = function(M, ridgeLines) {
     ridgeLines = ridgeLines.filter(function(line) {
-      var snr = line.SNR(M[0], widths);
+      var snr = line.SNR(M[0]);
       return (snr >= minSNR) && (line.length() >= minLineLength);
     });
     return ridgeLines
@@ -134,13 +134,13 @@ export default function() {
     var peaks = ridgeLines.map(function(line) {
       var points = line.points;
       var maxValue = Number.NEGATIVE_INFINITY,
-          maxIndex = -1;
+          maxPoint = undefined;
       points.forEach(function(point) {
         if (point.snr > maxValue) {
-          maxIndex = point.x;
+          maxPoint = point;
         }
       });
-      return maxIndex;
+      return maxPoint.serialize();
     });
     return peaks;
   }

@@ -42,16 +42,10 @@ RidgeLine.prototype.isDisconnected = function (threshold) {
 
 /**
  * @param {Array} Smallest scale in the convolution matrix
- * @param {Array} widths array.
  */
-RidgeLine.prototype.SNR = function(conv, widths) {
+RidgeLine.prototype.SNR = function(conv) {
   var maxSnr = Number.NEGATIVE_INFINITY;
   this.points.forEach(function(point) {
-    var width = widths[point.scale];
-    var lowerBound = Math.max(0, point.x - width);
-    var upperBound = Math.min(conv.length, point.x + width);
-    var neighbors = conv.slice(lowerBound, upperBound);
-    
     var snr = point.SNR(conv);
     if (snr > maxSnr) maxSnr = snr;
   });
