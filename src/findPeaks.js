@@ -16,9 +16,9 @@ export default function() {
     
     var ridgeLines = initializeRidgeLines(M);
     ridgeLines = connectRidgeLines(M, ridgeLines);
-    ridgeLines = filterRidgeLines(M, ridgeLines);
+    ridgeLines = filterRidgeLines(signal, ridgeLines);
     
-    return peaks(M, ridgeLines);
+    return peaks(signal, ridgeLines);
   };
   
   /**
@@ -119,25 +119,33 @@ export default function() {
     return ridgeLines;
   }
   
-  var filterRidgeLines = function(M, ridgeLines) {
+  var filterRidgeLines = function(signal, ridgeLines) {
+    var smoother = kernel()
+        .std(1.0);
+    var transform = convolve()
+      .kernel(smoother);
+    var convolution = transform(signal);
+      
     ridgeLines = ridgeLines.filter(function(line) {
-      var snr = line.SNR(M[0]);
+      var snr = line.SNR(convolution);
       return (snr >= minSNR) && (line.length() >= minLineLength);
     });
     return ridgeLines
   }
   
   /**
-   * Pick the point on the ridgeline with highest SNR.
+   * Pick the point with the highest y value within that range.
    */
-  var peaks = function(M, ridgeLines) {
+  var peaks = function(signal, ridgeLines) {
     var peaks = ridgeLines.map(function(line) {
       var points = line.points;
       var maxValue = Number.NEGATIVE_INFINITY,
           maxPoint = undefined;
       points.forEach(function(point) {
-        if (point.snr > maxValue) {
+        var y = signal[point.x];
+        if (y > maxValue) {
           maxPoint = point;
+          maxValue = y;
         }
       });
       return maxPoint.serialize();
