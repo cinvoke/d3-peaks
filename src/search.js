@@ -20,7 +20,6 @@ function isLocalMaxima(arr, index) {
  */
 export function maximas(arr) {
   var maximas = [];
-  var length = arr.length;
   arr.forEach(function(value, index) {
     if (isLocalMaxima(arr, index)) maximas.push({x: index, y: value});
   });
