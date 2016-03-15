@@ -12,7 +12,7 @@ Point.prototype.SNR = function(conv) {
   var signal = this.y;
   
   var lowerBound = Math.max(0, this.x - this.width);
-  var upperBound = Math.min(conv.length, this.x + this.width);
+  var upperBound = Math.min(conv.length, this.x + this.width + 1);
   var neighbors = conv.slice(lowerBound, upperBound);
   var noise = percentile(neighbors, 0.95);
   
