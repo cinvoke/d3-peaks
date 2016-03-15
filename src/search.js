@@ -1,39 +1,28 @@
+function isLocalMaxima(arr, index) {
+  var current = arr[index],
+      left = arr[index - 1],
+      right = arr[index + 1];
+      
+  if (left !== undefined && right !== undefined) {
+    if (current > left && current > right) { return true; }
+    else if (current >= left && current > right) { return true; }
+    else if (current > left && current >= right) { return true; }
+  }
+  else if (left !== undefined && current > left) { return true; }
+  else if (right !== undefined && current > right) { return true; }
+  
+  return false;
+}
+
 /**
  * @param {arr} row in the CWT matrix.
- * @param {window} Sliding window range.
  * @return Array of indices with relative maximas.
  */
-export function maximas(arr, window) {
-  var cache = {};
+export function maximas(arr) {
   var maximas = [];
   var length = arr.length;
   arr.forEach(function(value, index) {
-    var maxValue = Number.NEGATIVE_INFINITY,
-        maxIndex = -1;
-    
-    // TODO Use a max-heap
-    for (var w = 0; w <= window; w++) {
-      var right = index + w;
-      var left = index - w;
-      
-      if (left >= 0) {
-        if (arr[left] > maxValue) {
-          maxValue = arr[left];
-          maxIndex = left;
-        }
-      }
-      if (right < length) { 
-        if (arr[right] > maxValue) {
-          maxValue = arr[right];
-          maxIndex = right;
-        }
-      }
-    }
-    
-    if (!(maxIndex in cache)) {
-      maximas.push({x: maxIndex, y: maxValue});
-      cache[maxIndex] = maxValue;
-    }
+    if (isLocalMaxima(arr, index)) maximas.push({x: index, y: value});
   });
   return maximas;
 };

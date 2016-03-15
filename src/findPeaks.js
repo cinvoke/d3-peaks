@@ -2,7 +2,7 @@ import ricker from "./ricker";
 import convolve from "./convolve";
 import Point from "./Point";
 import RidgeLine from "./RidgeLine";
-import {maximas, nearestNeighbor, percentile} from "./search";
+import {maximas, nearestNeighbor} from "./search";
 
 export default function() {
   var kernel = ricker,
@@ -18,7 +18,7 @@ export default function() {
     ridgeLines = connectRidgeLines(M, ridgeLines);
     ridgeLines = filterRidgeLines(M, ridgeLines);
     
-    return peaks(ridgeLines);
+    return peaks(M, ridgeLines);
   };
   
   /**
@@ -71,28 +71,6 @@ export default function() {
     return M;
   }
   
-  var SNR = function(line, M) {
-    var points = line.points;
-    var x = -1,
-        scale = 0;
-    // Signal strength is the maximum CWT coefficient.
-    var signal = Number.NEGATIVE_INFINITY;
-    points.forEach(function(point) {
-      if (point.y > signal) {
-        signal = point.y;
-        x = point.x;
-        scale = point.scale;
-      }
-    });
-    
-    var width = widths[scale];
-    var lowerBound = Math.max(0, x - width);
-    var upperBound = Math.min(M[0].length, x + width);
-    var noise = percentile(M[0].slice(lowerBound, upperBound), 0.95);
-    
-    if (noise === 0) return 0;
-    return signal/noise;
-  }
   
   var initializeRidgeLines = function(M) {
     var n = widths.length;
@@ -143,21 +121,26 @@ export default function() {
   
   var filterRidgeLines = function(M, ridgeLines) {
     ridgeLines = ridgeLines.filter(function(line) {
-      var snr = SNR(line, M);
+      var snr = line.SNR(M[0], widths);
       return (snr >= minSNR) && (line.length() >= minLineLength);
     });
     return ridgeLines
   }
   
   /**
-   * Pick the median for every ridge line.
+   * Pick the point on the ridgeline with highest SNR.
    */
-  var peaks = function(ridgeLines) {
+  var peaks = function(M, ridgeLines) {
     var peaks = ridgeLines.map(function(line) {
       var points = line.points;
-      points = points.map(function(point) { return point.x });
-      points.sort(function(a, b) { return a - b });
-      return points[Math.floor(points.length / 2)];
+      var maxValue = Number.NEGATIVE_INFINITY,
+          maxIndex = -1;
+      points.forEach(function(point) {
+        if (point.snr > maxValue) {
+          maxIndex = point.x;
+        }
+      });
+      return maxIndex;
     });
     return peaks;
   }
