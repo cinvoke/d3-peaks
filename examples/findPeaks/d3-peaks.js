@@ -91,10 +91,94 @@
     return convolve;
   };
 
-  function Point(x, y, scale) {
+  function isLocalMaxima(arr, index) {
+    var current = arr[index],
+        left = arr[index - 1],
+        right = arr[index + 1];
+        
+    if (left !== undefined && right !== undefined) {
+      if (current > left && current > right) { return true; }
+      else if (current >= left && current > right) { return true; }
+      else if (current > left && current >= right) { return true; }
+    }
+    else if (left !== undefined && current > left) { return true; }
+    else if (right !== undefined && current > right) { return true; }
+    
+    return false;
+  }
+
+  /**
+   * @param {arr} row in the CWT matrix.
+   * @return Array of indices with relative maximas.
+   */
+  function maximas(arr) {
+    var maximas = [];
+    var length = arr.length;
+    arr.forEach(function(value, index) {
+      if (isLocalMaxima(arr, index)) maximas.push({x: index, y: value});
+    });
+    return maximas;
+  };
+
+  function nearestNeighbor(line, maximas, window) {
+    var cache = {};
+    maximas.forEach(function(d) {
+      cache[d.x] = d.y;
+    });
+    
+    var point = line.top();
+    for (var i = 0; i <= window; i++) {
+      var left = point.x + i;
+      var right = point.x - i;
+      
+      if ( (left in cache) && (right in cache) ) {
+        if (cache[left] > cache[right]) {
+          return left;
+        }
+        return right;
+      }
+      else if (left in cache) {
+        return left;
+      }
+      else if (right in cache) {
+        return right;
+      }
+    }
+    return null;
+  }
+
+  function percentile(arr, perc) {
+    var length = arr.length;
+    var index = Math.min(length - 1, Math.ceil(perc * length));
+    
+    arr.sort(function(a, b) { return a - b; });
+    return arr[index];
+  }
+
+  function Point(x, y, width) {
     this.x = x;
     this.y = y;
-    this.scale = scale;
+    this.width = width;
+    this.snr = undefined;
+  }
+
+  Point.prototype.SNR = function(conv) {
+    var smoothingFactor = 0.00001;
+    var signal = this.y;
+    
+    var lowerBound = Math.max(0, this.x - this.width);
+    var upperBound = Math.min(conv.length, this.x + this.width + 1);
+    var neighbors = conv.slice(lowerBound, upperBound);
+    var noise = percentile(neighbors, 0.95);
+    
+    signal += smoothingFactor;
+    noise += smoothingFactor;
+    this.snr = signal/noise;
+    return this.snr;
+  }
+
+  Point.prototype.serialize = function() {
+    return {index: this.x, width: this.width, snr: this.snr};
   }
 
   function RidgeLine() {
@@ -140,78 +224,15 @@
   }
 
   /**
-   * @param {arr} row in the CWT matrix.
-   * @param {window} Sliding window range.
-   * @return Array of indices with relative maximas.
+   * @param {Array} Smallest scale in the convolution matrix
    */
-  function maximas(arr, window) {
-    var cache = {};
-    var maximas = [];
-    var length = arr.length;
-    arr.forEach(function(value, index) {
-      var maxValue = Number.NEGATIVE_INFINITY,
-          maxIndex = -1;
-      
-      // TODO Use a max-heap
-      for (var w = 0; w <= window; w++) {
-        var right = index + w;
-        var left = index - w;
-        
-        if (left >= 0) {
-          if (arr[left] > maxValue) {
-            maxValue = arr[left];
-            maxIndex = left;
-          }
-        }
-        if (right < length) { 
-          if (arr[right] > maxValue) {
-            maxValue = arr[right];
-            maxIndex = right;
-          }
-        }
-      }
-      
-      if (!(maxIndex in cache)) {
-        maximas.push({x: maxIndex, y: maxValue});
-        cache[maxIndex] = maxValue;
-      }
+  RidgeLine.prototype.SNR = function(conv) {
+    var maxSnr = Number.NEGATIVE_INFINITY;
+    this.points.forEach(function(point) {
+      var snr = point.SNR(conv);
+      if (snr > maxSnr) maxSnr = snr;
     });
-    return maximas;
-  };
-
-  function nearestNeighbor(line, maximas, window) {
-    var cache = {};
-    maximas.forEach(function(d) {
-      cache[d.x] = d.y;
-    });
-    
-    var point = line.top();
-    for (var i = 0; i <= window; i++) {
-      var left = point.x + i;
-      var right = point.x - i;
-      
-      if ( (left in cache) && (right in cache) ) {
-        if (cache[left] > cache[right]) {
-          return left;
-        }
-        return right;
-      }
-      else if (left in cache) {
-        return left;
-      }
-      else if (right in cache) {
-        return right;
-      }
-    }
-    return null;
-  }
-
-  function percentile(arr, perc) {
-    var length = arr.length;
-    var index = Math.min(length - 1, Math.ceil(perc * length));
-    
-    arr.sort(function(a, b) { return a - b; });
-    return arr[index];
+    return maxSnr;
   }
 
   function findPeaks() {
@@ -226,9 +247,9 @@
       
       var ridgeLines = initializeRidgeLines(M);
       ridgeLines = connectRidgeLines(M, ridgeLines);
-      ridgeLines = filterRidgeLines(M, ridgeLines);
+      ridgeLines = filterRidgeLines(signal, ridgeLines);
       
-      return peaks(ridgeLines);
+      return peaks(signal, ridgeLines);
     };
     
     /**
@@ -281,35 +302,13 @@
       return M;
     }
     
-    var SNR = function(line, M) {
-      var points = line.points;
-      var x = -1,
-          scale = 0;
-      // Signal strength is the maximum CWT coefficient.
-      var signal = Number.NEGATIVE_INFINITY;
-      points.forEach(function(point) {
-        if (point.y > signal) {
-          signal = point.y;
-          x = point.x;
-          scale = point.scale;
-        }
-      });
-      
-      var width = widths[scale];
-      var lowerBound = Math.max(0, x - width);
-      var upperBound = Math.min(M[0].length, x + width);
-      var noise = percentile(M[0].slice(lowerBound, upperBound), 0.95);
-      
-      if (noise === 0) return 0;
-      return signal/noise;
-    }
     
     var initializeRidgeLines = function(M) {
       var n = widths.length;
       var locals = maximas(M[n - 1], widths[n - 1]);
       var ridgeLines = [];
       locals.forEach(function(d) {
-        var point = new Point(d.x, d.y, n - 1);
+        var point = new Point(d.x, d.y, widths[n - 1]);
         var line = new RidgeLine();
         line.add(point);
         ridgeLines.push(line);
@@ -326,7 +325,7 @@
         // Find nearest neighbor at next scale and add to the line
         ridgeLines.forEach(function(line, i) {
           var x = nearestNeighbor(line, locals, widths[row]);
-          line.add(x === null ? null : new Point(x, M[row][x], row));
+          line.add(x === null ? null : new Point(x, M[row][x], widths[row]));
           
           if (x !== null) {
             addedLocals.push(x);
@@ -342,7 +341,7 @@
         locals.forEach(function(d) {
           if (addedLocals.indexOf(d.x) !== -1) return;
           
-          var point = new Point(d.x, d.y, row);
+          var point = new Point(d.x, d.y, widths[row]);
           var ridgeLine = new RidgeLine();
           ridgeLine.add(point);
           ridgeLines.push(ridgeLine);
@@ -351,23 +350,36 @@
       return ridgeLines;
     }
     
-    var filterRidgeLines = function(M, ridgeLines) {
+    var filterRidgeLines = function(signal, ridgeLines) {
+      var smoother = kernel()
+          .std(1.0);
+      var transform = convolve()
+        .kernel(smoother);
+      var convolution = transform(signal);
+        
       ridgeLines = ridgeLines.filter(function(line) {
-        var snr = SNR(line, M);
+        var snr = line.SNR(convolution);
         return (snr >= minSNR) && (line.length() >= minLineLength);
       });
       return ridgeLines
     }
     
     /**
-     * Pick the median for every ridge line.
+     * Pick the point on the ridgeline with highest SNR.
      */
-    var peaks = function(ridgeLines) {
+    var peaks = function(signal, ridgeLines) {
       var peaks = ridgeLines.map(function(line) {
         var points = line.points;
-        points = points.map(function(point) { return point.x });
-        points.sort(function(a, b) { return a - b });
-        return points[Math.floor(points.length / 2)];
+        var maxValue = Number.NEGATIVE_INFINITY,
+            maxPoint = undefined;
+        points.forEach(function(point) {
+          var y = signal[point.x];
+          if (y > maxValue) {
+            maxPoint = point;
+            maxValue = y;
+          }
+        });
+        return maxPoint.serialize();
       });
       return peaks;
     }
