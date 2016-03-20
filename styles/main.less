@@ -6,25 +6,27 @@ body {
   font-weight: 400;
   color: #aaa;
   margin: 1em auto 4em auto;
-  width: 960px;
+  max-width: 960px;
+  font-size: 14px;
   @media screen {
-    @media (min-width: 320px) {
+    @media (max-width: 320px) {
       width: 320px;
       margin: 1em 1em 4em 1em;
     }
-    @media (min-width: 480px) {
+    @media (min-width: 320px) and (max-width: 480px) {
+      width: 320px;
+      margin: 1em 1em 4em 1em;
+    }
+    @media (min-width: 480px) and (max-width: 768px) {
       width: 480px;
       margin: 1em auto 4em auto;
     }
-    @media (min-width: 768px) {
+    @media (min-width: 768px) and (max-width: 992px) {
       width: 768px;
       margin: 1em auto 4em auto;
     }
-    @media (min-width: 992px) {
-      width: 960px;
-      margin: 1em auto 4em auto;
-    }
   }
+  
 }
 
 .header {
@@ -63,5 +65,4 @@ h2 {
 
 p {
   line-height: 1.5em;
-  font-size: 13px;
 }
