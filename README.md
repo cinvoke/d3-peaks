@@ -11,7 +11,7 @@ For examples, please see:
 
 ## Installing
 
-If you use NPM, `npm install d3-peaks`. Otherwise, download the [latest release](https://github.com/d3/d3-peaks/releases/latest).
+If you use NPM, `npm install d3-peaks`. Otherwise, download the [latest release](https://github.com/efekarakus/d3-peaks/releases/latest).
 
 ## API Reference
 
