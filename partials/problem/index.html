@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potential Peaks</title>
+<style>
+  body {
+    background: #222222;
+  }
+  
+  path.signal {
+    fill: none;
+    stroke: white;
+    stroke-width: 1.5px;
+  }
+</style>
+
+<body>
+<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+  d3.select(window).on("resize", resize);
+  var width = 920,
+      height = 200,
+      margin = {top: 10, left: 10, bottom: 20, right: 10};
+      
+  var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom);
+  var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+  
+  var x = d3.scale.linear();
+  var y = d3.scale.linear();
+  var line = d3.svg.line()
+    .x(function(d, i) { return x(i); })
+    .y(function(d) { return y(d); });
+    
+  d3.csv("hr.207", function(d) {
+    return +d.hr;
+  }, function(error, signal) {
+    x.domain([0, signal.length])
+      .range([0, width]);
+      
+    y.domain([d3.min(signal), d3.max(signal)])
+      .range([height, 0]);
+      
+    g.append("g")
+      .datum(signal)
+      .append("path")
+        .attr("d", line)
+        .attr("class", "signal");
+  });
+  
+  function resize() {
+    width = Math.min(920, window.innerWidth - margin.left - margin.right);
+    x.range([0, width]);
+    
+    d3.select("svg")
+      .attr("width", width + margin.left + margin.right);
+    
+    d3.select("path.signal")
+      .attr("d", line);
+  }
+</script>
+</body>
