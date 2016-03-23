@@ -1,10 +1,8 @@
-<html>
-<head>
+<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Understanding Peak Finding</title>
 <link href="./styles/d3-peaks.css" rel="stylesheet" type="text/css">
-</head>
 <body>
 
 <div class="header">
@@ -16,7 +14,16 @@
 <p>
 In this article, I explain how the 
 <a href="https://github.com/efekarakus/d3-peaks" target="_blank">d3-peaks</a>
-plugin works.
+plugin works. The plugin is based on the work of Du, Pan, Warren A. Kibbe, and Simon M. Lin. 
+<a href="https://bioinformatics.oxfordjournals.org/content/22/17/2059.full" target="_blank">
+"Improved peak detection in mass spectrum by incorporating continuous wavelet transform-based pattern matching."</a>
+Bioinformatics 22.17 (2006): 2059-2065.
+</p>
+</p>
+The goal of this article is not to only explain how the algorithm works. 
+But, hopefully achieve a higher goal and show that with examples and 
+explanations we can make complex research papers a lot more readable, 
+and hence reach a broader audience.
 </p>
 
 <h2>
@@ -25,7 +32,10 @@ Problem
 </h2>
 
 <p>
+Imagine we are given the heart rates of an individual while exercising. 
+We want to find out when are the periods of rest and activity. 
+By finding <span class="highlight">relevant</span> peaks in the dataset,
+we can discern the underlying region beneath it and label the regions accordingly.
 </p>
 
 </body>
-</html>
