@@ -3,15 +3,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Potential Peaks</title>
 <style>
-  body {
-    background: #222222;
-  }
-  
-  path.signal {
+  path {
     fill: none;
-    stroke: white;
+    stroke: black;
     stroke-width: 1.5px;
   }
+  
+  path.activity {
+    stroke: #FC4483;
+  }
+  
+  /*
+  path.rest {
+    fill: #1FFDB1;
+  }
+  */
 </style>
 
 <body>
@@ -31,33 +37,56 @@
   var x = d3.scale.linear();
   var y = d3.scale.linear();
   var line = d3.svg.line()
-    .x(function(d, i) { return x(i); })
-    .y(function(d) { return y(d); });
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.hr); });
     
-  d3.csv("hr.207", function(d) {
-    return +d.hr;
+  d3.csv("hr.207", function(d, i) {
+    var type = "rest";
+    if (i >= 0 && i <= 23) {
+      type = "activity";
+    } else if (i >= 370 && i <= 450) {
+      type = "activity";
+    } else if (i >= 776 && i <= 836) {
+      type = "activity";
+    }
+    return {x: i,  hr: +d.hr, type: type};
   }, function(error, signal) {
     x.domain([0, signal.length])
       .range([0, width]);
       
-    y.domain([d3.min(signal), d3.max(signal)])
+    y.domain([d3.min(signal, function(d) { return d.hr; }), d3.max(signal, function(d) { return d.hr; })])
       .range([height, 0]);
-      
-    g.append("g")
-      .datum(signal)
+    
+    var heartbeats = [];
+    var current = [];
+    var previous = "activity";
+    signal.forEach(function(d) {
+      current.push(d);
+      if (previous !== d.type) {
+        heartbeats.push(current);
+        current = [];
+        previous = d.type;
+      }
+      current.push(d);
+    });
+    heartbeats.push(current);
+    
+    g.selectAll(".signal")
+      .data(heartbeats)
+      .enter().append("g")
       .append("path")
         .attr("d", line)
-        .attr("class", "signal");
+        .attr("class", function(d, i) { return heartbeats[i][0].type; });
   });
   
   function resize() {
     width = Math.min(920, window.innerWidth - margin.left - margin.right);
     x.range([0, width]);
     
-    d3.select("svg")
+    var svg = d3.select("svg")
       .attr("width", width + margin.left + margin.right);
     
-    d3.select("path.signal")
+    svg.selectAll("path")
       .attr("d", line);
   }
 </script>
