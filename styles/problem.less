@@ -1,0 +1,33 @@
+.vis.problem {
+  path {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+    
+    @media (min-width: 320px) and (max-width: 480px) {
+      stroke-width: 1px;
+    }
+    
+    &.activity {
+      stroke: #FC4483;
+    }
+  }
+  
+  circle.peak {
+    stroke: black;
+    fill: #1F5AFD;
+  }
+  
+  .axis path,
+  .axis line {
+      fill: none;
+      stroke: black;
+      stroke-width: 1px;
+      shape-rendering: crispEdges;
+  }
+  
+  text {
+      font-family: sans-serif;
+      font-size: 11px;
+  }
+}

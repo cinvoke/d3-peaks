@@ -58,3 +58,31 @@ span.highlight {
 p {
   line-height: 1.5em;
 }
+.vis.problem path {
+  fill: none;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .vis.problem path {
+    stroke-width: 1px;
+  }
+}
+.vis.problem path.activity {
+  stroke: #FC4483;
+}
+.vis.problem circle.peak {
+  stroke: black;
+  fill: #1F5AFD;
+}
+.vis.problem .axis path,
+.vis.problem .axis line {
+  fill: none;
+  stroke: black;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+.vis.problem text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
