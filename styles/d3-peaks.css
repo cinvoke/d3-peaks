@@ -65,7 +65,7 @@ p {
 }
 @media (min-width: 320px) and (max-width: 480px) {
   .vis.problem path {
-    stroke-width: 1px;
+    stroke-width: 0.7px;
   }
 }
 .vis.problem path.activity {
