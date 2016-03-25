@@ -95,6 +95,7 @@
     .style("text-anchor", "end")
     .text("heart rate (bpm)");
     
+  resize();
   
   function resize() {
     if (window.innerWidth >= 960) {
